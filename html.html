@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>柔柔的星空單字預習 · Lesson 3 Prometheus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --midnight:#0d0b2b;
+    --indigo:#181450;
+    --indigo-2:#221c66;
+    --panel: rgba(38,32,102,.55);
+    --panel-solid:#1d1856;
+    --line: rgba(201,184,255,.22);
+    --pink:#ff9ec4;
+    --pink-soft:#f6d3e4;
+    --lav:#c9b8ff;
+    --gold:#ffe6a3;
+    --text:#ece9ff;
+    --text-dim:#b3acdf;
+    --text-faint:#8983c0;
+    --r-red:#ff9aa6;      /* 要會的字 */
+    --hl-y:#f2d96b;       /* 線索 */
+    --hl-g:#8fe0a6;       /* 文法/介系詞 */
+    --hl-b:#8fc6f2;       /* chunk */
+    --hl-ink:#221735;
+    --radius:20px;
+    box-sizing:border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-padding-top: env(safe-area-inset-top, 0px);}
+  body{
+    margin:0;
+    font-family:"Quicksand","Noto Sans TC",system-ui,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 700px at 78% -8%, #3a2f7a 0%, rgba(58,47,122,0) 55%),
+      radial-gradient(900px 600px at 12% 8%, #2b2472 0%, rgba(43,36,114,0) 50%),
+      linear-gradient(170deg, #0f0c33 0%, var(--midnight) 45%, #08061c 100%);
+    min-height:100%;
+    overflow-x:hidden;
+  }
+  /* star layers */
+  .sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .stars{position:absolute;inset:-2px;background-repeat:repeat}
+  .stars.s1{opacity:.9}
+  .stars.s2{opacity:.55}
+  .twinkle{animation:tw 4s ease-in-out infinite alternate}
+  .twinkle.d{animation-delay:2s}
+  @keyframes tw{from{opacity:.35}to{opacity:.95}}
+  .moon{position:absolute;top:38px;right:6%;width:74px;height:74px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff7e0, #ffe6a3 55%, #f4c96b 100%);
+    box-shadow:0 0 50px 12px rgba(255,230,163,.45), inset -10px -8px 18px rgba(190,150,60,.4);}
+  @media (max-width:640px){.moon{width:52px;height:52px;top:26px;right:8%}}
+
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:26px 18px 90px}
+
+  /* ---------- hero ---------- */
+  header.hero{text-align:center;padding:26px 8px 8px;position:relative}
+  .eyebrow{font-family:"Quicksand";font-weight:600;letter-spacing:.12em;color:var(--lav);
+    font-size:13px;margin:0 0 6px;opacity:.9}
+  h1{font-family:"Baloo 2","Noto Sans TC",cursive;font-weight:800;
+    font-size:clamp(30px,6.4vw,52px);line-height:1.05;margin:0;
+    color:#fff;text-shadow:0 2px 26px rgba(255,158,196,.45), 0 0 2px rgba(255,255,255,.4)}
+  h1 .spark{color:var(--gold)}
+  .sub{margin:12px 0 0;color:var(--text-dim);font-size:15px}
+  .sub b{color:var(--pink-soft);font-weight:600}
+
+  /* progress */
+  .prog{margin:22px auto 4px;max-width:460px}
+  .prog-top{display:flex;justify-content:space-between;align-items:baseline;
+    font-size:13px;color:var(--text-dim);margin-bottom:7px;padding:0 2px}
+  .prog-top .count{font-family:"Baloo 2";font-weight:700;font-size:16px;color:var(--gold)}
+  .bar{height:12px;border-radius:20px;background:rgba(12,9,40,.6);
+    border:1px solid var(--line);overflow:hidden;position:relative}
+  .bar-fill{height:100%;width:0;border-radius:20px;
+    background:linear-gradient(90deg,#ff9ec4,#c9b8ff 60%,#8fc6f2);
+    box-shadow:0 0 14px rgba(255,158,196,.6);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  .cheer{min-height:18px;text-align:center;font-size:13px;color:var(--gold);
+    margin-top:8px;font-weight:600;opacity:0;transition:opacity .3s}
+  .cheer.show{opacity:1}
+
+  /* ---------- legend ---------- */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 10px;justify-content:center;
+    margin:22px auto 6px;max-width:720px}
+  .legend .lg{display:inline-flex;align-items:center;gap:7px;font-size:13px;
+    background:var(--panel);border:1px solid var(--line);padding:6px 12px;border-radius:40px;
+    backdrop-filter:blur(6px)}
+  .swatch{width:15px;height:15px;border-radius:5px;flex:none}
+  .sw-r{background:transparent;border:2px solid var(--r-red)}
+  .sw-y{background:var(--hl-y)}
+  .sw-g{background:var(--hl-g)}
+  .sw-b{background:var(--hl-b)}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:6px;justify-content:center;margin:26px auto 0;
+    background:var(--panel);border:1px solid var(--line);border-radius:40px;padding:6px;
+    width:fit-content;max-width:100%;backdrop-filter:blur(8px);flex-wrap:wrap}
+  .tab{appearance:none;border:0;background:transparent;color:var(--text-dim);
+    font-family:"Baloo 2","Noto Sans TC";font-weight:600;font-size:15px;cursor:pointer;
+    padding:9px 18px;border-radius:30px;transition:.2s;white-space:nowrap}
+  .tab .n{font-family:"Quicksand";font-weight:600;font-size:12px;opacity:.7;margin-left:5px}
+  .tab:hover{color:var(--text)}
+  .tab[aria-selected="true"]{background:linear-gradient(135deg,#ff9ec4,#c9b8ff);
+    color:#2a1640;box-shadow:0 6px 18px rgba(255,158,196,.35)}
+  .tab[aria-selected="true"] .n{opacity:.85}
+
+  /* tools */
+  .tools{display:flex;gap:10px;justify-content:center;align-items:center;
+    margin:16px auto 4px;flex-wrap:wrap}
+  .search{position:relative}
+  .search input{font-family:"Quicksand","Noto Sans TC";font-size:14px;color:var(--text);
+    background:var(--panel);border:1px solid var(--line);border-radius:30px;
+    padding:10px 16px 10px 38px;width:230px;max-width:74vw;outline:none;transition:.2s}
+  .search input::placeholder{color:var(--text-faint)}
+  .search input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,158,196,.18)}
+  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);
+    width:16px;height:16px;stroke:var(--text-faint);fill:none}
+  .btn{font-family:"Baloo 2","Noto Sans TC";font-weight:600;font-size:14px;cursor:pointer;
+    background:var(--panel);color:var(--text);border:1px solid var(--line);
+    border-radius:30px;padding:10px 16px;transition:.2s;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{border-color:var(--lav);transform:translateY(-1px)}
+  .btn.on{background:linear-gradient(135deg,#8fc6f2,#c9b8ff);color:#1c2540;border-color:transparent}
+  .btn.quiz{background:linear-gradient(135deg,#ffe6a3,#ff9ec4);color:#3a2010;border-color:transparent;
+    box-shadow:0 6px 16px rgba(255,196,120,.3)}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:14px;margin-top:24px;align-items:start}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 16px 14px;backdrop-filter:blur(10px);position:relative;
+    transition:border-color .2s, transform .2s, box-shadow .2s}
+  .card:hover{border-color:rgba(201,184,255,.45)}
+  .card.learned{border-color:rgba(255,230,163,.6);
+    box-shadow:0 0 0 1px rgba(255,230,163,.25), 0 8px 26px rgba(255,214,120,.12)}
+  .card.open{grid-column:1/-1}
+  .card-head{display:flex;flex-direction:column;gap:3px}
+  .wline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .word{font-family:"Baloo 2";font-weight:700;font-size:23px;color:#fff;letter-spacing:.2px}
+  .say{appearance:none;border:0;background:rgba(201,184,255,.14);cursor:pointer;
+    width:30px;height:30px;border-radius:50%;color:var(--lav);font-size:14px;
+    display:grid;place-items:center;transition:.15s;flex:none}
+  .say:hover{background:var(--pink);color:#2a1640;transform:scale(1.08)}
+  .star{position:absolute;top:12px;right:12px;appearance:none;border:0;background:none;
+    cursor:pointer;font-size:22px;line-height:1;color:var(--text-faint);transition:.15s}
+  .star:hover{transform:scale(1.2) rotate(8deg);color:var(--gold)}
+  .card.learned .star{color:var(--gold);text-shadow:0 0 12px rgba(255,230,163,.7)}
+  .meta{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:1px}
+  .pos{font-family:"Quicksand";font-weight:600;font-size:12px;color:var(--pink);
+    background:rgba(255,158,196,.14);padding:2px 9px;border-radius:20px}
+  .ph{font-family:"Quicksand";font-size:13px;color:var(--text-faint)}
+  .zh{font-family:"Noto Sans TC";font-weight:500;font-size:17px;color:var(--pink-soft);margin-top:9px;transition:.2s}
+  body.hidezh .zh{filter:blur(7px);cursor:pointer;user-select:none}
+  body.hidezh .zh:hover{filter:blur(3px)}
+  .expand{margin-top:12px;width:100%;appearance:none;cursor:pointer;
+    background:rgba(12,9,40,.35);border:1px dashed var(--line);color:var(--text-dim);
+    font-family:"Quicksand","Noto Sans TC";font-weight:600;font-size:13px;
+    padding:8px;border-radius:12px;transition:.2s}
+  .expand:hover{color:var(--text);border-color:var(--lav)}
+
+  .detail{overflow:hidden;max-height:0;transition:max-height .35s ease}
+  .card.open .detail{max-height:3000px}
+  .detail-in{padding-top:14px;margin-top:14px;border-top:1px solid var(--line)}
+  .def{font-size:14px;color:var(--text-dim);font-style:italic;margin-bottom:14px;line-height:1.55}
+  .blk-label{font-family:"Baloo 2","Noto Sans TC";font-weight:600;font-size:13px;
+    color:var(--gold);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+  .ex{margin:0 0 12px;padding-left:14px;border-left:2px solid rgba(201,184,255,.3)}
+  .ex .en{font-size:15px;line-height:1.6;color:var(--text)}
+  .ex .tw{font-family:"Noto Sans TC";font-size:13.5px;color:var(--text-faint);margin-top:4px;line-height:1.6}
+  body.hidezh .ex .tw{filter:blur(6px)}
+  body.hidezh .ex .tw:hover{filter:blur(2px)}
+  .col{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:13px;background:rgba(12,9,40,.4);border:1px solid var(--line);
+    border-radius:12px;padding:7px 11px;line-height:1.5}
+  .chip .cz{font-family:"Noto Sans TC";color:var(--text-faint);margin-left:5px}
+  .deriv{background:rgba(143,198,242,.08);border:1px solid rgba(143,198,242,.2);
+    border-radius:14px;padding:12px 13px;margin-top:8px}
+  .deriv-h{font-size:15px;margin-bottom:8px}
+  .deriv-h .dw{font-family:"Baloo 2";font-weight:700;color:#cfe6ff;font-size:17px}
+  .deriv-h .dp{font-family:"Quicksand";font-size:12px;color:var(--hl-b);margin-left:6px}
+  .deriv-h .dz{font-family:"Noto Sans TC";color:var(--text-dim);margin-left:6px;font-size:14px}
+
+  /* highlight code */
+  .r{color:var(--r-red);font-weight:600}
+  .y,.g,.b{border-radius:6px;padding:1px 5px;color:var(--hl-ink);font-weight:600;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .y{background:var(--hl-y)}
+  .g{background:var(--hl-g)}
+  .b{background:var(--hl-b)}
+  .tip{font-family:"Noto Sans TC";font-size:12px;color:var(--gold);
+    background:rgba(255,230,163,.1);border:1px solid rgba(255,230,163,.25);
+    padding:2px 8px;border-radius:20px;margin-left:6px;font-weight:500;white-space:nowrap}
+
+  .empty{text-align:center;color:var(--text-faint);padding:60px 20px;font-family:"Noto Sans TC";grid-column:1/-1}
+
+  /* ---------- quiz ---------- */
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(8,6,24,.78);
+    backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:18px}
+  .overlay.show{display:flex}
+  .quizbox{background:var(--panel-solid);border:1px solid var(--line);border-radius:26px;
+    width:100%;max-width:460px;padding:26px 22px 22px;position:relative;
+    box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  .qclose{position:absolute;top:14px;right:16px;background:none;border:0;color:var(--text-faint);
+    font-size:26px;cursor:pointer;line-height:1}
+  .qclose:hover{color:var(--pink)}
+  .qtop{display:flex;justify-content:space-between;align-items:center;font-size:13px;
+    color:var(--text-dim);margin-bottom:16px}
+  .qtop .qscore{font-family:"Baloo 2";color:var(--gold);font-weight:700}
+  .qbar{height:6px;border-radius:10px;background:rgba(12,9,40,.6);overflow:hidden;margin-bottom:20px}
+  .qbar > i{display:block;height:100%;background:linear-gradient(90deg,#ff9ec4,#c9b8ff);transition:width .3s}
+  .qask{font-family:"Noto Sans TC";text-align:center;margin-bottom:6px;color:var(--text-dim);font-size:13px}
+  .qword{font-family:"Baloo 2","Noto Sans TC";text-align:center;font-size:26px;font-weight:700;
+    color:#fff;margin-bottom:20px}
+  .qopts{display:flex;flex-direction:column;gap:10px}
+  .qopt{font-family:"Noto Sans TC","Quicksand";font-size:16px;text-align:left;cursor:pointer;
+    background:rgba(12,9,40,.4);border:1.5px solid var(--line);color:var(--text);
+    border-radius:14px;padding:13px 16px;transition:.15s}
+  .qopt:hover:not(:disabled){border-color:var(--lav);transform:translateX(3px)}
+  .qopt:disabled{cursor:default}
+  .qopt.correct{background:rgba(143,224,166,.2);border-color:var(--hl-g);color:#d6ffe2}
+  .qopt.wrong{background:rgba(255,154,166,.18);border-color:var(--r-red);color:#ffd6da}
+  .qnext{margin-top:18px;width:100%;font-family:"Baloo 2","Noto Sans TC";font-weight:700;font-size:16px;
+    cursor:pointer;border:0;border-radius:16px;padding:13px;color:#2a1640;
+    background:linear-gradient(135deg,#ff9ec4,#c9b8ff);transition:.2s;opacity:.5;pointer-events:none}
+  .qnext.ready{opacity:1;pointer-events:auto}
+  .qnext:hover{transform:translateY(-2px)}
+  .qresult{text-align:center;padding:10px 0}
+  .qresult .big{font-family:"Baloo 2";font-size:52px;color:var(--gold);margin:6px 0}
+  .qresult .msg{font-family:"Noto Sans TC";color:var(--text-dim);margin-bottom:20px;font-size:15px}
+
+  footer{text-align:center;color:var(--text-faint);font-size:12px;margin-top:40px;
+    font-family:"Noto Sans TC";line-height:1.7}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  @media (max-width:640px){
+    .wrap{padding:18px 14px 80px}
+    .grid{grid-template-columns:1fr;gap:12px}
+    .word{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true">
+  <div class="stars s1 twinkle"></div>
+  <div class="stars s2 twinkle d"></div>
+  <div class="moon"></div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Lesson 3 · Prometheus 普羅米修斯</p>
+    <h1>柔柔的星空<span class="spark">單字</span>預習</h1>
+    <p class="sub">普羅米修斯為<b>人類</b>盜火的那一課 ✨ 一顆顆點亮你的單字星空</p>
+
+    <div class="prog">
+      <div class="prog-top"><span>學會的字</span><span class="count"><span id="learnedN">0</span> / <span id="totalN">0</span></span></div>
+      <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+      <div class="cheer" id="cheer"></div>
+    </div>
+
+    <div class="legend" aria-label="顏色說明">
+      <span class="lg"><span class="swatch sw-r"></span>要會 / 可學的字</span>
+      <span class="lg"><span class="swatch sw-y"></span>線索</span>
+      <span class="lg"><span class="swatch sw-g"></span>文法 / 介系詞</span>
+      <span class="lg"><span class="swatch sw-b"></span>chunk 語塊</span>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-part="1" aria-selected="true">生產字<span class="n">21</span></button>
+    <button class="tab" role="tab" data-part="2" aria-selected="false">片語<span class="n">6</span></button>
+    <button class="tab" role="tab" data-part="3" aria-selected="false">認識字<span class="n">12</span></button>
+  </div>
+
+  <div class="tools">
+    <div class="search">
+      <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="search" placeholder="搜尋單字或中文…" autocomplete="off">
+    </div>
+    <button class="btn" id="hideBtn">🙈 遮住中文</button>
+    <button class="btn quiz" id="quizBtn">🎯 開始小測驗</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <footer>
+    ⭐ 點星星把學會的字收進星空　·　🔊 點喇叭聽發音　·　🙈 遮住中文自己考自己<br>
+    為柔柔做的預習頁 · 顏色對應老師的四色筆記
+  </footer>
+</div>
+
+<!-- quiz -->
+<div class="overlay" id="overlay">
+  <div class="quizbox" id="quizbox"></div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const DATA = {
+1:[
+ {w:"humankind",pos:"n. [U]",ph:"[ˋhjumənˏkaɪnd]",zh:"人類",
+  def:"the human race; all people as a whole",
+  ex:[{en:`With all the environmental damage it is causing, humankind is destroying planet Earth.`,tw:`因為我們所造成這一切對環境的破壞，人類正在毀滅地球。`}],
+  col:[{en:"the future of humankind",zh:"人類的未來"}]},
+
+ {w:"universe",pos:"n. sing.",ph:"[ˋjunəˏvɝs]",zh:"宇宙",
+  def:"stars, planets, moons, and everything else that exists in space",
+  ex:[{en:`<span class="g">Compared with</span> other stars in the universe, our sun is actually quite small.`,tw:`相較於宇宙中其他的恆星，我們的太陽事實上相當小。`}],
+  col:[{en:"in the universe",zh:"在宇宙中"}],
+  deriv:{w:"universal",pos:"adj.",zh:"普遍的；全宇宙的",
+    ex:[{en:`Regardless of race or culture, there seems to be a <span class="r">universal</span> fear of death among all people.`,tw:`不論哪一個種族或文化，在所有人類之間似乎都有對死亡的恐懼。`}],
+    col:[{en:"a universal truth / fear",zh:"普遍的真理 / 恐懼"}]}},
+
+ {w:"fur",pos:"n. [U]",ph:"[fɝ]",zh:"（動物的）毛；毛皮",
+  def:"the soft hair covering animals",
+  ex:[{en:`Polar bears are covered in thick fur that protects them from the bitter cold.`,tw:`北極熊被厚重毛皮所覆蓋，保護牠們免於嚴寒的侵襲。`},
+      {en:`Many people don't <span class="y">approve of</span> killing animals for clothing. They buy clothes made from fake fur instead.`,tw:`許多人不贊同為衣物殺害動物。他們購買假毛皮所作成的衣服作為替代。`}],
+  col:[{en:"be covered in thick fur",zh:"被厚重毛皮覆蓋"},{en:"fake fur / real fur",zh:"假毛皮 / 真毛皮"}]},
+
+ {w:"enable",pos:"vt.",ph:"[ɪnˋebl̩]",zh:"使……能夠……",
+  def:`to <span class="y">make someone able</span> to do something`,
+  ex:[{en:`Powerful telescopes enable us to observe distant planets, moons, and stars in this enormous universe.`,tw:`強力的望遠鏡使我們能夠觀察在這個浩瀚宇宙中遙遠的行星、衛星以及恆星。`}],
+  col:[{en:"enable sb. to + VR",zh:"使某人能夠做某事",tip:"超高頻寫作句型！"},{en:"enable + N + to-VR",zh:"使……得以進行"}]},
+
+ {w:"upright",pos:"adv. / adj.",ph:"[ˋʌpˏraɪt]",zh:"直立地；直立的",
+  def:`standing straight; <span class="r">vertically</span>`,
+  ex:[{en:`It's better for your back if you sit upright in your chair and don't bend over your desk.`,tw:`在椅子上直立坐著，不要趴在書桌上，對你的背較有好處。`},
+      {en:`During <span class="r">takeoff</span> and landing, please return your seat to the upright position.`,tw:`飛機起飛及降落時，請把你的座位調回到直立的位置。`}],
+  col:[{en:"sit / stand upright",zh:"直立坐著 / 站著"},{en:"upright position",zh:"直立的位置"}]},
+
+ {w:"generous",pos:"adj.",ph:"[ˋdʒɛnərəs]",zh:"慷慨的；大方的",
+  def:`taking pleasure in giving freely; not <span class="r">stingy</span> or selfish`,
+  ex:[{en:`It was very generous of Jen to give her niece all that expensive jewelry. It must be <span class="y">worth a fortune</span>.`,tw:`Jen 很慷慨，把那些昂貴的珠寶送給她的姪女。那些珠寶一定價值不菲。`}],
+  col:[{en:"It is generous of sb. to + VR",zh:"某人做某事真慷慨"},{en:`be generous <span class="g">with</span> sth.`,zh:"對某物很大方"}],
+  deriv:{w:"generosity",pos:"n. [U]",zh:"慷慨；大方",
+    ex:[{en:`It is our custom to show kindness and generosity to strangers and treat them like royal guests.`,tw:`我們的習俗是對陌生人表達仁慈及慷慨，並且對待他們如同王室的客人。`}]}},
+
+ {w:"conflict",pos:"n. [U,C] / vi.",ph:"[ˋkɑnflɪkt] (n.) / [kənˋflɪkt] (v.)",zh:"衝突；抵觸",
+  def:"serious argument, fight, or war; to disagree with ideas or accounts",
+  ex:[{en:`Both nations believed the island belonged to them, so they soon came into conflict with each other.`,tw:`兩個國家都相信這座島屬於他們，所以很快就彼此發生衝突。`},
+      {en:`A team from the UN was sent to the war zone to resolve the conflict between the two warring states.`,tw:`有一個聯合國的團隊被派到戰區，去解決兩個交戰國的衝突。`},
+      {en:`The witness said that she had heard a shot at nine, but this conflicted with her earlier statement that she had gotten home at ten.`,tw:`目擊證人說，她九點聽到一聲槍響，但這與她先前說她十點到家的說法抵觸。`}],
+  col:[{en:`come into <span class="b">conflict</span> with sb.`,zh:"與某人發生衝突"},{en:"resolve the conflict",zh:"解決衝突"},{en:`<span class="b">conflict</span> with sth. (v.)`,zh:"與某事物抵觸 / 不一致"}]},
+
+ {w:"distribution",pos:"n. [U]",ph:"[ˏdɪstrəˋbjuʃən]",zh:"分配；分布",
+  def:"how something is spread or shared among a group or over an area",
+  ex:[{en:`The large forest fire has affected the distribution of wild animals within the national park.`,tw:`這場森林大火已經影響了在這座國家公園內野生動物的分布。`}],
+  col:[{en:`<span class="y">unequal distribution of wealth</span>`,zh:"財富分配不均"}],
+  deriv:{w:"distribute",pos:"vt.",zh:"分發；分配",
+    ex:[{en:`Just before the start of the movie, 3D glasses were distributed to all the members of the audience.`,tw:`就在電影開演之前，立體電影眼鏡被分發給所有的觀眾。`}],
+    col:[{en:`distribute sth. <span class="g">to</span> sb.`,zh:"分發某物給某人"}]}},
+
+ {w:"benefit",pos:"n. [U,C] / vt. / vi.",ph:"[ˋbɛnəfɪt]",zh:"益處；有益於；得益於",
+  def:`an advantage or <span class="r">gain</span>; to have a helpful effect; to gain from something`,
+  ex:[{en:`Everyone agreed that free education for all would solve a lot of problems and be of great benefit to society.`,tw:`每個人都同意，大眾免費教育會解決許多問題，並且對社會有大的益處。`},
+      {en:`Healthier skin and more energy are two of the benefits of eating more fresh fruit and vegetables.`,tw:`更健康的皮膚以及更多的精力，是吃更多新鮮的水果蔬菜的其中兩個好處。`},
+      {en:`People <span class="y">of all ages</span> can benefit from getting more sleep and <span class="r">consuming</span> less sugar.`,tw:`不同年齡層的人都可以得益於睡眠充足以及少吃糖。`}],
+  col:[{en:`be <span class="y">of great benefit</span> to sb./sth.`,zh:"對……有極大益處",tip:"= be highly beneficial to"},{en:"benefit from sth.",zh:"從某事中受益"},{en:`<span class="y">reap the benefits</span>`,zh:"收穫好處"}],
+  deriv:{w:"beneficial",pos:"adj.",zh:"有利的；有幫助的",
+    ex:[{en:`Cutting down on pollution will be beneficial not only to humankind but also to the planet.`,tw:`減少汙染不只將對人類有幫助，對地球也有幫助。`}]}},
+
+ {w:"slaughter",pos:"vt. / n. [U]",ph:"[ˋslɔtɚ]",zh:"宰殺；屠殺",
+  def:"to kill an animal for its meat; to kill many people in a cruel war",
+  ex:[{en:`Pigs are often transported to Taipei before being slaughtered so that the meat will be fresh.`,tw:`豬隻被宰殺之前通常會運送到臺北，這樣牠們的肉才會新鮮。`},
+      {en:`An <span class="r">estimated</span> six million Jews were slaughtered by the Nazis during World War II.`,tw:`據估計，二次世界大戰期間，有六百萬的猶太人被納粹政權屠殺。`},
+      {en:`A civil war <span class="y">broke out</span> and led to the slaughter of thousands of innocent citizens.`,tw:`內戰爆發，導致數千位無辜的公民被屠殺。`}]},
+
+ {w:"underneath",pos:"prep. / adv.",ph:"[ˏʌndɚˋniθ]",zh:"在……下",
+  def:"below or under (a cover, mask, lid, etc.)",
+  ex:[{en:`Every night, the little boy asks his mother to check if any monsters are hiding underneath his bed.`,tw:`每天晚上，這個小男孩會叫媽媽檢查他的床鋪底下是否藏著怪物。`}]},
+
+ {w:"freeze",pos:"vi. / vt.",ph:"[friz] · froze–frozen",zh:"受凍；結冰；冷凍",
+  def:`to suffer terrible cold; to turn into ice; to <span class="r">store</span> food <span class="g">at</span> extremely low temperatures`,
+  ex:[{en:`If you go out in the snow without a coat and gloves, you'll freeze to death.`,tw:`如果你沒有穿大衣戴手套，就在雪中外出，你將會凍死。`},
+      {en:`My mother took the extra bread and froze it for next week's lunches.`,tw:`我媽媽把多餘的麵包冷凍起來，當作下週的午餐。`},
+      {en:`When the lake freezes over in December, locals enjoy skating on the hard, icy surface.`,tw:`當十二月湖面全面結冰時，當地人喜歡在堅硬的結冰表面上溜冰。`}],
+  col:[{en:"freeze to death",zh:"凍死"},{en:"freeze over",zh:"全面結冰"}]},
+
+ {w:"victim",pos:"n. [C]",ph:"[ˋvɪktɪm]",zh:"受害者；罹難者",
+  def:"a person who suffers or dies because of an accident, crime, attack, or disease",
+  ex:[{en:`At the moment, victims of the huge flood are <span class="y">taking shelter</span> in the local school hall.`,tw:`目前大水災的災民正在當地的學校禮堂避難。`}],
+  col:[{en:`<span class="y">fall victim to</span> <span class="b">domestic violence</span>`,zh:"成為家暴的受害者"}]},
+
+ {w:"miserable",pos:"adj.",ph:"[ˋmɪzərəbl̩]",zh:"悲慘的；痛苦的",
+  def:"very sad or unhappy due to mental or physical suffering",
+  ex:[{en:`Danny felt miserable when he was unable to find the watch that his grandfather had given to him.`,tw:`Danny 找不到祖父送他的手錶時，感到很悲慘。`}],
+  deriv:{w:"misery",pos:"n. [U,C]",zh:"悲慘；慘況",
+    ex:[{en:`Years of conflict in the area have caused great misery. It's time to make peace and end the suffering.`,tw:`這個地區多年的衝突已經引起極大的慘況。現在是談和並結束痛苦的時候了。`}]}},
+
+ {w:"hollow",pos:"adj.",ph:"[ˋhɑlo]",zh:"中空的",
+  def:"empty on the inside; filled with air only",
+  ex:[{en:`Water pipes are usually completely hollow inside, so the water can flow through them freely.`,tw:`水管通常裡面完全是中空的，所以水可以自由地在裡面流通。`}]},
+
+ {w:"furious",pos:"adj.",ph:"[ˋfjʊrɪəs]",zh:"暴怒的；狂怒的",
+  def:`extremely angry; <span class="y">in a rage</span>`,
+  ex:[{en:`People were furious at the government for not distributing funds <span class="r">evenly</span> among schools in the area.`,tw:`對於政府未將資金平均分配給這個地區的每個學校，人民感到憤怒。`}],
+  col:[{en:"be furious with / at sb.",zh:"對某人感到暴怒"},{en:"be furious at / about sth.",zh:"因某事感到憤怒"}],
+  deriv:{w:"fury",pos:"n. [U]",zh:"狂怒；暴怒",
+    ex:[{en:`Tom Sawyer's aunt shook with fury when she found that he had <span class="y">tricked</span> his friends <span class="y">into</span> painting the fence for him.`,tw:`Tom Sawyer 的姨媽發現他誘騙朋友為他粉刷籬笆時，憤怒地發抖。`}]}},
+
+ {w:"theft",pos:"n. [C,U]",ph:"[θɛft]",zh:"偷竊；偷竊罪",
+  def:"the action of stealing something from someone",
+  ex:[{en:`The criminal didn't only rob the bank. He also committed a car theft while trying to get away from the police.`,tw:`這名罪犯不只搶劫銀行。他試圖躲避警方追捕時，還犯了偷車罪。`},
+      {en:`Caryn was a victim of identity theft yesterday. Somebody used her name and credit card details to buy things online.`,tw:`昨天 Caryn 是身分盜用的受害者。有人用了她的名字和信用卡的資料上網購物。`}],
+  col:[{en:"commit a theft",zh:"犯下偷竊罪"},{en:`car theft / <span class="b">identity theft</span>`,zh:"汽車竊盜 / 身分盜用"}]},
+
+ {w:"punish",pos:"vt.",ph:"[ˋpʌnɪʃ]",zh:"懲罰",
+  def:"to force someone to suffer because he or she has done something wrong",
+  ex:[{en:`Benjamin was punished by his parents for coming home late again. He <span class="y">was grounded</span> for a whole month!`,tw:`Benjamin 因為再次晚回家被父母處罰。他被禁足一整個月！`}],
+  col:[{en:`<span class="y">punish sb. for sth.</span>`,zh:"為了某事懲罰某人"}],
+  deriv:{w:"punishment",pos:"n. [U,C]",zh:"懲罰",
+    ex:[{en:`As punishment for not completing her homework, Evelyn had to sweep the floor after class.`,tw:`作為沒寫完作業的處罰，Evelyn 下課後必須掃地。`}],
+    col:[{en:"as punishment for...",zh:"作為對……的處罰"},{en:`<span class="y">capital punishment</span>`,zh:"死刑"}]}},
+
+ {w:"banish",pos:"vt.",ph:"[ˋbænɪʃ]",zh:"放逐；流放",
+  def:"to force someone to leave a place or country and never come back",
+  ex:[{en:`The prince was banished from the kingdom for trying to kill the king.`,tw:`王子因為試圖殺害國王就被放逐離開王國。`}],
+  col:[{en:"banish sb. from + 地點",zh:"將某人從……放逐"}],
+  deriv:{w:"banishment",pos:"n. [U]",zh:"放逐",
+    ex:[{en:`In the old days, some crimes were punished by banishment from a country or kingdom.`,tw:`在古時候，某些罪行會藉流放國外以示懲戒。`}]}},
+
+ {w:"torture",pos:"vt. / n. [U,C]",ph:"[ˋtɔrtʃɚ]",zh:"折磨；拷問",
+  def:`to force someone to suffer a lot of pain, often <span class="y">on purpose 故意地</span> and <span class="y">without mercy = mercilessly 毫無憐憫之心地</span>`,
+  ex:[{en:`Professional athletes torture themselves with long <span class="r">workouts</span> and practice routines in order to become the best.`,tw:`專業的運動員以長時間的鍛鍊與規律的練習來磨練自己以成為最好。`},
+      {en:`A foot <span class="r">massage</span> may seem like torture at the time, but afterward you will feel relaxed and refreshed.`,tw:`腳底按摩在當下或許會像是折磨，但之後你會感到放鬆並恢復精神。`},
+      {en:`The government later apologized for the tortures the prisoners had suffered during the war.`,tw:`政府之後向在戰爭期間遭受折磨的囚犯道歉。`}]},
+
+ {w:"civilization",pos:"n. [U,C]",ph:"[ˏsɪvl̩əˋzeʃən]",zh:"文明；文明世界",
+  def:"advanced, well-developed, and organized human society",
+  ex:[{en:`The new port and bridges brought civilization to the <span class="r">remote</span> island.`,tw:`新的港口和橋梁給這座偏遠的島嶼帶來文明。`},
+      {en:`Several temples and stone roads are proof that an ancient civilization once existed near this lake.`,tw:`幾座寺廟以及石頭道路，證明有個古代文明曾經存在於這座湖的附近區域。`}],
+  col:[{en:"ancient civilization",zh:"古代文明"},{en:"the dawn of civilization",zh:"文明的黎明 / 開端"}]}
+],
+2:[
+ {w:"run out (of...)",pos:"phr.",ph:"",zh:"用完；耗盡",
+  ex:[{en:`When the bus ran out of gas, a friendly truck driver generously offered everybody a ride.`,tw:`當公車耗盡了汽油時，一位友善的卡車司機慷慨地自願搭載每一個人。`}],
+  col:[{en:"run out of + sth.",zh:"用完某物（及物）"},{en:"run out",zh:"（某物）被用完了（不及物）"}]},
+
+ {w:"make up for",pos:"phr.",ph:"",zh:"彌補；補償",
+  ex:[{en:`Amy <span class="y">was</span> wrongly <span class="y">punished for</span> something her brother had done, so her mom bought her new shoes to <span class="y">make up for</span> it.`,tw:`Amy 因為她兄弟所做的某件事而被錯誤地處罰，所以她媽媽替她買了新鞋作為補償。`}],
+  col:[{en:"make up for + N / V-ing",zh:"彌補……"},{en:`make up for <span class="b">the loss</span> / <span class="b">lost time</span>`,zh:"彌補損失 / 失去的時間"}]},
+
+ {w:"as a result",pos:"phr.",ph:"",zh:"因此；結果",
+  ex:[{en:`The hikers made a large fire and, as a result, were safe from wild beasts throughout the night.`,tw:`登山客們生了一個大火，因此，整個晚上免於野獸的侵襲。`}],
+  col:[{en:`as a result, S + V`,zh:"句首副詞片語，後接逗號"},{en:"as a result of + N / V-ing",zh:"由於……的結果",tip:"= because of / due to"}]},
+
+ {w:"fall victim to",pos:"phr.",ph:"",zh:"成為……的受害者",
+  ex:[{en:`If you never change your password, it is easy for you to <span class="y">fall victim to identity theft</span>.`,tw:`如果你從未更改密碼，你很容易成為身分盜用的受害者。`}],
+  col:[{en:`fall victim <span class="g">to</span> + N`,zh:"成為……的受害者（to 為介係詞）"}]},
+
+ {w:"feed on",pos:"phr.",ph:"feed–fed–fed",zh:"靠……為食",
+  ex:[{en:`<span class="r">Omnivore</span>s are animals such as pigs or rats that can feed on both meat and plants.`,tw:`雜食動物像豬或老鼠是肉和植物都會吃的動物。`}],
+  col:[{en:"feed on + sth.",zh:"（動物）以某食物為食；引申「因……而壯大」"},{en:"live on sth.",zh:"靠……維生（多指人）"}]},
+
+ {w:"set the stage for",pos:"phr.",ph:"",zh:"為……作好準備；奠定基礎",
+  ex:[{en:`The invention of the smartphone set the stage for the development of thousands of different apps.`,tw:`智慧型手機的發明為數千種不同的應用軟體作好準備。`}],
+  col:[{en:"set the stage for + sth.",zh:"為……搭好舞台 → 奠定基礎"},{en:`<span class="y">pave the way for sth.</span>`,zh:"為……鋪平道路"}]}
+],
+3:[
+ {w:"Prometheus",pos:"n.",ph:"[prəˋmiθjəs]",zh:"普羅米修斯",note:"希臘神話的泰坦巨人，名字意為「先知、深謀遠慮」"},
+ {w:"Titan",pos:"n.",ph:"[ˋtaɪtn̩]",zh:"泰坦巨人",note:"古希臘神話中曾統治世界的古老巨神族"},
+ {w:"Epimetheus",pos:"n.",ph:"[ɛpɪˋmiθjəs]",zh:"艾比米修斯",note:"普羅米修斯的兄弟，名字意為「後知後覺、事後諸葛」"},
+ {w:"Zeus",pos:"n.",ph:"[zus]",zh:"宙斯",note:"古希臘神話中的眾神之王，奧林匹亞山的主神"},
+ {w:"Olympian",pos:"adj.",ph:"[oˋlɪmpɪən]",zh:"奧林匹亞山的",note:"指居住在奧林匹亞山上的神祇"},
+ {w:"Mecone",pos:"n.",ph:"[məˋkon]",zh:"墨康",note:"古希臘地名，神祇與人類在此討論祭品分配"},
+ {w:"offering",pos:"n. [C]",ph:"[ˋɔfərɪŋ]",zh:"祭品；奉獻物",
+  ex:[{en:`The ancient villagers brought fresh fruits and flowers to the temple as an offering to the gods of the harvest.`,tw:`古代村民將新鮮水果和花朵帶到寺廟，作為獻給豐收之神的祭品。`}],
+  col:[{en:"make an offering to...",zh:"向……獻上祭品"}]},
+ {w:"beast",pos:"n. [C]",ph:"[bist]",zh:"野獸；獸類",
+  ex:[{en:`The brave knight <span class="y">drew his sword</span> and prepared to fight the fierce beast that had been attacking the town.`,tw:`勇敢的騎士拔出劍，準備與那隻一直攻擊城鎮的兇猛野獸戰鬥。`}],
+  col:[{en:"wild beast / fierce beast",zh:"野獸 / 猛獸"}]},
+ {w:"stalk",pos:"n. [C]",ph:"[stɔk]",zh:"（植物的）莖；梗",
+  ex:[{en:`You can chop up the celery stalk and add it to the soup for extra flavor and crunch.`,tw:`你可以把芹菜莖切碎加入湯裡，以增加風味和爽脆的口感。`}]},
+ {w:"fennel",pos:"n. [U]",ph:"[ˋfɛnl̩]",zh:"茴香",
+  ex:[{en:`The chef <span class="r">season</span>ed the roasted salmon with a little bit of lemon juice and some dried fennel.`,tw:`主廚用少許檸檬汁和一些乾燥的茴香來為烤鮭魚調味。`}]},
+ {w:"liver",pos:"n. [C]",ph:"[ˋlɪvɚ]",zh:"肝臟",
+  ex:[{en:`The doctor warned him that drinking too much alcohol over a long period of time would <span class="y">cause serious damage to</span> his liver.`,tw:`醫生警告他，長期過度飲酒會對他的肝臟造成嚴重的損害。`}]},
+ {w:"gnaw",pos:"vi.",ph:"[nɔ]",zh:"啃咬",
+  ex:[{en:`The cute puppy found an old shoe in the living room and began to gnaw on it happily.`,tw:`那隻可愛的小狗在客廳找到一隻舊鞋，便開心地開始啃咬它。`}],
+  col:[{en:"gnaw at / gnaw on + 物品",zh:"啃咬某物"}]}
+]
+};
+
+/* flatten with ids */
+let ID=0; const ALL=[];
+for(const p of [1,2,3]) DATA[p].forEach(it=>{it._id="w"+(ID++);it._part=p;ALL.push(it);});
+const TOTAL=ALL.length;
+
+/* ============ progress store ============ */
+const KEY="rourou-prometheus-learned-v1";
+let learned=new Set();
+try{const s=localStorage.getItem(KEY); if(s) learned=new Set(JSON.parse(s));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify([...learned]));}catch(e){}}
+
+const CHEERS=["每一顆都是你點亮的星 ✨","柔柔好棒，繼續加油！🌙","星空越來越亮了 💫","背起來的字都收進口袋了 🌟"];
+function updateProgress(){
+  const n=learned.size;
+  document.getElementById("learnedN").textContent=n;
+  document.getElementById("totalN").textContent=TOTAL;
+  document.getElementById("barFill").style.width=(n/TOTAL*100)+"%";
+  const c=document.getElementById("cheer");
+  if(n===TOTAL){c.textContent="🎉 整課單字都學會了，太厲害了！";c.classList.add("show");}
+  else if(n>0){c.textContent=CHEERS[Math.min(3,Math.floor(n/TOTAL*4))];c.classList.add("show");}
+  else c.classList.remove("show");
+}
+
+/* ============ speak ============ */
+const canSpeak = "speechSynthesis" in window;
+function speak(text){
+  if(!canSpeak) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/\(.*?\)|\.\.\./g,"").trim());
+    u.lang="en-US"; u.rate=.9; speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ============ render ============ */
+let part=1, query="";
+const grid=document.getElementById("grid");
+
+function colHTML(col){
+  if(!col||!col.length) return "";
+  return `<div class="blk-label">★ 重要搭配</div><div class="col">`+
+    col.map(c=>`<span class="chip">${c.en}${c.zh?`<span class="cz">${c.zh}</span>`:""}${c.tip?`<span class="tip">${c.tip}</span>`:""}</span>`).join("")+`</div>`;
+}
+function exHTML(ex){
+  if(!ex||!ex.length) return "";
+  return `<div class="blk-label">✎ 例句</div>`+ex.map(e=>
+    `<div class="ex"><div class="en">${e.en}</div>${e.tw?`<div class="tw">${e.tw}</div>`:""}</div>`).join("");
+}
+function detailHTML(it){
+  let h=`<div class="detail-in">`;
+  if(it.def) h+=`<div class="def">${it.def}</div>`;
+  if(it.note) h+=`<div class="def" style="font-style:normal;color:var(--pink-soft)">💡 ${it.note}</div>`;
+  h+=exHTML(it.ex);
+  h+=colHTML(it.col);
+  if(it.deriv){
+    const d=it.deriv;
+    h+=`<div class="blk-label">🔗 延伸字</div><div class="deriv">
+      <div class="deriv-h"><span class="dw">${d.w}</span><span class="dp">${d.pos}</span><span class="dz">${d.zh}</span></div>
+      ${exHTML(d.ex)}${colHTML(d.col)}</div>`;
+  }
+  h+=`</div>`;
+  return h;
+}
+function cardHTML(it){
+  const isL=learned.has(it._id);
+  return `<article class="card${isL?" learned":""}" data-id="${it._id}">
+    <button class="star" title="標記為學會" aria-label="標記為學會">${isL?"★":"☆"}</button>
+    <div class="card-head">
+      <div class="wline">
+        <span class="word">${it.w}</span>
+        ${canSpeak?`<button class="say" title="聽發音" aria-label="聽發音">🔊</button>`:""}
+      </div>
+      <div class="meta"><span class="pos">${it.pos}</span>${it.ph?`<span class="ph">${it.ph}</span>`:""}</div>
+      <div class="zh">${it.zh}</div>
+    </div>
+    <button class="expand">展開詳解 ▾</button>
+    <div class="detail">${detailHTML(it)}</div>
+  </article>`;
+}
+function render(){
+  const q=query.trim().toLowerCase();
+  const list=ALL.filter(it=>it._part===part).filter(it=>{
+    if(!q) return true;
+    return (it.w+" "+it.zh+" "+(it.note||"")+" "+(it.deriv?it.deriv.w+it.deriv.zh:"")).toLowerCase().includes(q);
+  });
+  grid.innerHTML = list.length ? list.map(cardHTML).join("")
+    : `<div class="empty">找不到「${query}」這個字 🔍<br>換個關鍵字試試看吧</div>`;
+}
+
+/* events (delegated) */
+grid.addEventListener("click",e=>{
+  const card=e.target.closest(".card"); if(!card) return;
+  const id=card.dataset.id, it=ALL.find(x=>x._id===id);
+  if(e.target.closest(".star")){
+    if(learned.has(id)){learned.delete(id);} else {learned.add(id);}
+    save(); card.classList.toggle("learned"); 
+    card.querySelector(".star").textContent=learned.has(id)?"★":"☆";
+    updateProgress(); return;
+  }
+  if(e.target.closest(".say")){ speak(it.w); return; }
+  if(e.target.closest(".zh") && document.body.classList.contains("hidezh")) return;
+  if(e.target.closest(".expand") || e.target.closest(".card-head")){
+    const opening=!card.classList.contains("open");
+    card.classList.toggle("open");
+    const b=card.querySelector(".expand"); if(b) b.textContent=opening?"收起 ▴":"展開詳解 ▾";
+  }
+});
+
+document.getElementById("tabs").addEventListener("click",e=>{
+  const t=e.target.closest(".tab"); if(!t) return;
+  [...document.querySelectorAll(".tab")].forEach(x=>x.setAttribute("aria-selected","false"));
+  t.setAttribute("aria-selected","true");
+  part=+t.dataset.part; render();
+});
+document.getElementById("search").addEventListener("input",e=>{query=e.target.value;render();});
+document.getElementById("hideBtn").addEventListener("click",e=>{
+  document.body.classList.toggle("hidezh");
+  const on=document.body.classList.contains("hidezh");
+  e.currentTarget.classList.toggle("on",on);
+  e.currentTarget.textContent=on?"👀 顯示中文":"🙈 遮住中文";
+});
+
+/* ============ quiz ============ */
+const overlay=document.getElementById("overlay"), qbox=document.getElementById("quizbox");
+let quiz={list:[],i:0,score:0,answered:false};
+function startQuiz(){
+  const pool=ALL.filter(it=>it._part===part);
+  quiz.list=[...pool].sort(()=>Math.random()-.5).slice(0,Math.min(10,pool.length));
+  quiz.i=0;quiz.score=0;quiz.answered=false;
+  overlay.classList.add("show"); renderQuiz();
+}
+function closeQuiz(){overlay.classList.remove("show");}
+function renderQuiz(){
+  if(quiz.i>=quiz.list.length){ return renderResult(); }
+  const it=quiz.list[quiz.i];
+  const pool=ALL.filter(x=>x._id!==it._id);
+  const wrong=[...pool].sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[...wrong,it].sort(()=>Math.random()-.5);
+  qbox.innerHTML=`<button class="qclose" aria-label="關閉">×</button>
+    <div class="qtop"><span>第 ${quiz.i+1} / ${quiz.list.length} 題</span><span class="qscore">⭐ ${quiz.score}</span></div>
+    <div class="qbar"><i style="width:${quiz.i/quiz.list.length*100}%"></i></div>
+    <div class="qask">這個字的意思是？</div>
+    <div class="qword">${it.w}</div>
+    <div class="qopts">${opts.map(o=>`<button class="qopt" data-id="${o._id}">${o.zh}</button>`).join("")}</div>
+    <button class="qnext">下一題 →</button>`;
+  quiz.answered=false;
+  qbox.querySelector(".qclose").onclick=closeQuiz;
+  qbox.querySelectorAll(".qopt").forEach(b=>b.onclick=()=>answer(b,it));
+  qbox.querySelector(".qnext").onclick=()=>{quiz.i++;renderQuiz();};
+}
+function answer(btn,it){
+  if(quiz.answered) return; quiz.answered=true;
+  const correct=btn.dataset.id===it._id;
+  if(correct){quiz.score++;btn.classList.add("correct");}
+  else{btn.classList.add("wrong");
+    qbox.querySelector(`.qopt[data-id="${it._id}"]`).classList.add("correct");}
+  qbox.querySelectorAll(".qopt").forEach(b=>b.disabled=true);
+  qbox.querySelector(".qscore").textContent="⭐ "+quiz.score;
+  qbox.querySelector(".qnext").classList.add("ready");
+  if(quiz.i===quiz.list.length-1) qbox.querySelector(".qnext").textContent="看結果 🎀";
+}
+function renderResult(){
+  const n=quiz.score,t=quiz.list.length,pct=n/t;
+  const msg = pct===1?"滿分！你根本是單字小星星 🌟":pct>=.7?"很不錯，快要全部收服了！":pct>=.4?"有進步空間，再複習一下 💪":"沒關係，多看幾次就記起來了 🌙";
+  qbox.innerHTML=`<button class="qclose" aria-label="關閉">×</button>
+    <div class="qresult"><div class="qask">測驗結果</div>
+    <div class="big">${n}/${t}</div><div class="msg">${msg}</div>
+    <button class="qnext ready" id="again">再玩一次 🔁</button></div>`;
+  qbox.querySelector(".qclose").onclick=closeQuiz;
+  qbox.querySelector("#again").onclick=startQuiz;
+}
+document.getElementById("quizBtn").addEventListener("click",startQuiz);
+overlay.addEventListener("click",e=>{if(e.target===overlay)closeQuiz();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeQuiz();});
+
+/* ============ stars background ============ */
+function starField(n,size){
+  let c=document.createElement("canvas");c.width=c.height=400;
+  let x=c.getContext("2d");
+  for(let i=0;i<n;i++){
+    x.globalAlpha=Math.random()*.7+.3;
+    x.fillStyle="#fff";
+    x.beginPath();x.arc(Math.random()*400,Math.random()*400,Math.random()*size,0,7);x.fill();
+  }
+  return c.toDataURL();
+}
+try{
+  document.querySelector(".stars.s1").style.backgroundImage=`url(${starField(60,1.3)})`;
+  document.querySelector(".stars.s2").style.backgroundImage=`url(${starField(40,2)})`;
+}catch(e){}
+
+/* init */
+updateProgress();
+render();
+</script>
+</body>
+</html>
