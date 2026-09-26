@@ -170,6 +170,12 @@
   .blk-label{font-family:"Baloo 2","Noto Sans TC";font-weight:600;font-size:13px;
     color:var(--gold);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
   .ex{margin:0 0 12px;padding-left:14px;border-left:2px solid rgba(201,184,255,.3)}
+  .en-row{display:flex;gap:8px;align-items:flex-start}
+  .en-row .en{flex:1}
+  .say-ex{flex:none;appearance:none;border:0;background:rgba(201,184,255,.14);cursor:pointer;
+    width:26px;height:26px;border-radius:50%;color:var(--lav);font-size:12px;
+    display:grid;place-items:center;transition:.15s;margin-top:2px}
+  .say-ex:hover{background:var(--pink);color:#2a1640;transform:scale(1.08)}
   .ex .en{font-size:15px;line-height:1.6;color:var(--text)}
   .ex .tw{font-family:"Noto Sans TC";font-size:13.5px;color:var(--text-faint);margin-top:4px;line-height:1.6}
   body.hidezh .ex .tw{filter:blur(6px)}
@@ -521,6 +527,14 @@ function speak(text){
     u.lang="en-US"; u.rate=.9; speechSynthesis.speak(u);
   }catch(e){}
 }
+function speakSentence(t){
+  if(!canSpeak||!t) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t.trim());
+    u.lang="en-US"; u.rate=.88; speechSynthesis.speak(u);
+  }catch(e){}
+}
 
 /* ============ render ============ */
 let part=1, query="";
@@ -534,7 +548,7 @@ function colHTML(col){
 function exHTML(ex){
   if(!ex||!ex.length) return "";
   return `<div class="blk-label">✎ 例句</div>`+ex.map(e=>
-    `<div class="ex"><div class="en">${e.en}</div>${e.tw?`<div class="tw">${e.tw}</div>`:""}</div>`).join("");
+    `<div class="ex"><div class="en-row"><div class="en">${e.en}</div>${canSpeak?`<button class="say-ex" title="聽整句" aria-label="聽整句">🔊</button>`:""}</div>${e.tw?`<div class="tw">${e.tw}</div>`:""}</div>`).join("");
 }
 function detailHTML(it){
   let h=`<div class="detail-in">`;
@@ -586,6 +600,11 @@ grid.addEventListener("click",e=>{
     save(); card.classList.toggle("learned"); 
     card.querySelector(".star").textContent=learned.has(id)?"★":"☆";
     updateProgress(); return;
+  }
+  if(e.target.closest(".say-ex")){
+    const enEl=e.target.closest(".ex").querySelector(".en");
+    if(enEl) speakSentence(enEl.textContent);
+    return;
   }
   if(e.target.closest(".say")){ speak(it.w); return; }
   if(e.target.closest(".zh") && document.body.classList.contains("hidezh")) return;
